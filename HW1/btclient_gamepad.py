@@ -81,4 +81,4 @@ while gamepad.isConnected():
             value = -value
             right_y = value
         # print('left_x: %+.1f %%, left_y: %+.1f %%, right_y: %+.1f %%, right_y: %+.1f %%,' % (left_x * 100, left_y * 100, right_x * 100, right_y * 100))
-        c.send('A {} {}'.format(control, value))
+        c.send('A {} {} '.format(control, value))
