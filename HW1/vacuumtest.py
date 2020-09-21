@@ -1,20 +1,30 @@
-import RPi.GPIO as GPIO
-from time import sleep
+import pigpio
+import time
 
-pin = 12				# PWM pin connected to LED
-GPIO.setwarnings(False)			#disable warnings
-GPIO.setmode(GPIO.BOARD)		#set pin numbering system
-GPIO.setup(pin,GPIO.OUT)
-pi_pwm = GPIO.PWM(pin,8000)		#create PWM instance with frequency
-pi_pwm.start(0)				#start PWM of required Duty Cycle 
+max_value = 1900
+min_spin = 1200
+min_value = 1000
+ESC_pin = 4
+pi = pigpio.pi();
+pi.set_servo_pulsewidth(ESC_pin, 0) 
+
+def calibrate():   #This is the auto calibration procedure of a normal ESC
+	pi.set_servo_pulsewidth(ESC_pin, min_value) 
+	time.sleep(1)
+	pi.set_servo_pulsewidth(ESC_pin, min_spin)
+	time.sleep(1)
+	pi.set_servo_pulsewidth(ESC_pin, min_value)
+	print("calibration done")
+
+calibrate()
 
 while True:
 	try:
 		duty = int(input('duty cycle: '))
-		pi_pwm.ChangeDutyCycle(duty)
-		sleep(0.1)
+		time.sleep(0.1)
+		pi.set_servo_pulsewidth(ESC_pin, duty)
 	except KeyboardInterrupt:
-		pi_pwm.ChangeDutyCycle(0)
+		pi.set_servo_pulsewidth(ESC_pin, 0)
 		break
 	except:
 		continue
