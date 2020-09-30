@@ -1,12 +1,12 @@
+# This code is modified from the original "CustomGamepadExample.py" from the Gamepad library.
+# Specifically re-designed to work with: https://www.amazon.com/gp/product/B00IR3U03Y/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1
+
 import sys
 sys.path.insert(0, "/home/pi/Gamepad")
 
 import Gamepad
 import time
 from bluedot.btcomm import BluetoothClient
-
-# This code is adopted from the original "CustomGamepadExample.py" from the Gamepad library.
-# Specifically re-designed to work with: https://www.amazon.com/gp/product/B00IR3U03Y/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1
 
 # Press ENTER without typing a name to get raw numbers for each
 # button press or axis movement, press CTRL+C when done
@@ -63,7 +63,7 @@ while gamepad.isConnected():
     # Wait for the next event
     eventType, control, value = gamepad.getNextEvent()
 
-    # Determine the type
+    # Determine the type and send data to the server Raspberry Pi
     if eventType == 'BUTTON':
         # Button changed
         # print('Button: {} State: {}'.format(control, value))
