@@ -66,12 +66,12 @@ class DeltaKinematics:
 	 
 
 class DeltaMotion:
-	def __init__(self, s_range = 135, zero = 60, driver_channel = 16):
+	def __init__(self, s_range = 135, zero = 50, driver_channel = 16):
 		self.servo_range = s_range
-		self.zero = 60
+		self.zero = zero
 		self.kit = ServoKit(channels = driver_channel)
 		self.init_robot()
-		self.move_all(self.zero)
+		self.move_all(self.zero - 20)
 
 	def init_robot(self):
 		for i in range(3):

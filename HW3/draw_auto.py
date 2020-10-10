@@ -26,7 +26,7 @@ def scale_xy(array, max_val):
 	array[:,1] *= (50 / max(abs(array[:,1])))
 	return array
 
-z_draw_height = -200
+z_draw_height = -220
 max_val = 50
 
 delta = DeltaKinematics()
@@ -49,9 +49,9 @@ coord = scale_xy(coord, max_val)
 
 for points in coord:
 	bot.move_robot(delta.inverse_kinematics(points[0], points[1], points[2]))
-	print(points)
+	#print(points)
 	time.sleep(0.2)
 
 time.sleep(1)
-bot.move_all(0)
+bot.move_all(30)
 
