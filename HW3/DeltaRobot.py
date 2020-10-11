@@ -22,9 +22,12 @@ Notes:
 --Theta1 is pointing to the negative diself.Rection of Y axis. 
 '''
 from adafruit_servokit import ServoKit
+import numpy as np
 import math
 import time
+import csv
 
+# Class for converting target cartesian coordinates to motor angles
 class DeltaKinematics:
 	def __init__(self, end_radius=20.65, base_radius=45.32, end_arm=248, base_arm=76.75, angle_min = 5, angle_max = 90):
 		self.Re = end_radius
@@ -65,13 +68,14 @@ class DeltaKinematics:
 				return theta_A, theta_B, theta_C if theta_C != False else theta_C
 	 
 
+# Class for driving the delta robot. contains functions for both automatic drawing and manual testing
 class DeltaMotion:
-	def __init__(self, s_range = 135, c_range = 120, zero = 60, driver_channel = 16):
+	def __init__(self, s_range = 135, c_range = 120, c_down = 36, zero = 50, driver_channel = 16):
 		self.servo_range = s_range
 		self.clamp_range = c_range
-		self.clamp_up = c_range
-		self.clamp_down = 36
-		self.zero = 60
+		self.c_up = c_range
+		self.c_down = c_down
+		self.zero = zero
 		self.kit = ServoKit(channels = driver_channel)
 		self.init_robot()
 		self.move_all(self.zero - 20)
@@ -96,9 +100,31 @@ class DeltaMotion:
 				self.kit.servo[i].angle = self.zero + angle_list[i]
 
 	def clamp_down(self):
-		self.kit.servo[3].angle = self.clamp_down
-		self.kit.servo[4].angle = self.clamp_down
+		self.kit.servo[3].angle = self.c_down
+		self.kit.servo[4].angle = self.c_down
 
 	def clamp_up(self):
-		self.kit.servo[3].angle = self.clamp_up
-		self.kit.servo[4].angle = self.clamp_up
+		self.kit.servo[3].angle = self.c_up
+		self.kit.servo[4].angle = self.c_up
+
+
+# Helper function: reads csv coordinates file and return the 2D list
+def read_csv(filename):
+	with open(filename) as csv_file:
+		coord = []        # convert csv file into 2D list of xyz coordinates
+		line_count = 0    # keep track of number of data
+		csv_reader = csv.reader(csv_file, delimiter = ",")
+		for row in csv_reader:
+			row_data = []
+			for item in row:
+				row_data.append(float(item))
+			coord.append(row_data)
+			line_count += 1
+		print("Processed {} coordinates".format(line_count))
+		return coord
+
+# Helper function: scales the coordinate for legibility - if needed
+def scale_xy(array, max_val):
+	array[:,0] *= (50 / max(abs(array[:,0])))
+	array[:,1] *= (50 / max(abs(array[:,1])))
+	return array
