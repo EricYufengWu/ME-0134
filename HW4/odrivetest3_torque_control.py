@@ -22,26 +22,25 @@ time.sleep(15)
 # setup close_loop control
 my_motor.requested_state = 8 # AXIS_STATE_CLOSED_LOOP_CONTROL
 
-# run motor at velocity mode (incremental speed)
-my_motor.controller.config.control_mode = 3 # position control
-
 # first slowly move the motor back to zero pos
+my_motor.controller.config.control_mode = 3 # position control
 my_motor.controller.config.vel_limit = 1
 my_motor.controller.input_pos = 0
 time.sleep(3)
-my_motor.controller.config.vel_limit = 5
+my_motor.controller.config.vel_limit = 10
 
-# loop oscillation
+my_motor.controller.config.control_mode = 1 # torque control
+# loop
 while True:
     try: 
-        my_motor.controller.input_pos = 0.02  # unit is in turns
-        time.sleep(0.1)
-        print(my_motor.encoder.shadow_count)  # print encoder count
-        my_motor.controller.input_pos = 0
-        time.sleep(0.1)
+        my_motor.controller.input_torque = 0.1  # unit is in Nm
+        time.sleep(1)
+        print(my_motor.encoder.shadow_count)  # unit is in Nm
+        my_motor.controller.input_pos = -0.1
+        time.sleep(1)
         print(my_motor.encoder.shadow_count)
     except KeyboardInterrupt:
-        my_motor.controller.input_pos = 0
+        my_motor.controller.input_torque = 0
         my_motor.requested_state = 1  #AXIS_STATE_IDLE
         break
 
