@@ -44,4 +44,3 @@ while True:
         my_motor.controller.input_pos = 0
         my_motor.requested_state = 1  #AXIS_STATE_IDLE
         break
-
