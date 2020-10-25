@@ -27,8 +27,8 @@ my_motor.controller.config.control_mode = 3 # position control
 # first slowly move the motor back to zero pos
 my_motor.controller.config.vel_limit = 1
 my_motor.controller.input_pos = 0
-time.sleep(3)
-my_motor.controller.config.vel_limit = 5
+time.sleep(5)
+my_motor.controller.config.vel_limit = 3
 
 # loop oscillation
 while True:
