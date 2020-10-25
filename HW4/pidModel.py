@@ -83,7 +83,9 @@ if __name__ == '__main__':
     Theta_dot = 0
     Theta_tminus1 = Theta_tminus2 = arm.armtheta
     Phi_tminus1 = Phi_tminus2 = pendulum.pendulumPhi
+
     #previous_error = find_error(pendulum)
+
     integral = 0
     previous_time_delta = 0
     simulation_time = 30
@@ -95,14 +97,17 @@ if __name__ == '__main__':
     while time.time() <= end_time:
         current_timestamp = time.time()
         time_delta = (current_timestamp - previous_timestamp)
+
        # error = find_error(pendulum)
         if previous_time_delta != 0:    
             Theta_dot = (Theta_tminus1 - Theta_tminus2 ) / previous_time_delta
             Phi_dot = (Phi_tminus1 - Phi_tminus2) / previous_time_delta
+
             # F, intergral = find_pid_control_input(time_delta,error,previous_error,integral)
             position_calculate(arm, pendulum, time_delta, Theta_dot, Theta_tminus2, Phi_dot, Phi_tminus2, previous_time_delta)
 
             # Update the position of odrive
+
             # my_motor.controller.input_pos = 3 * arm.armtheta / (2*math.pi)
 
         # Update the variables
@@ -113,3 +118,4 @@ if __name__ == '__main__':
         Theta_tminus1 = arm.armtheta
         Phi_tminus2 = Phi_tminus1
         Phi_tminus1 = pendulum.pendulumPhi
+
