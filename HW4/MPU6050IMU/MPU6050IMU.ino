@@ -182,11 +182,11 @@ void loop()
     yaw   *= 180.0f / PI;
     roll  *= 180.0f / PI;
 
-    Serial.print("Yaw, Pitch, Roll: ");
-    Serial.print(yaw, 2);
-    Serial.print(", ");
-    Serial.print(pitch, 2);
-    Serial.print(", ");
+//    Serial.print("Yaw, Pitch, Roll: ");
+//    Serial.print(yaw, 2);
+//    Serial.print(", ");
+//    Serial.print(pitch, 2);
+//    Serial.print(", ");
     Serial.println(roll, 2);
 
 //    //    Serial.print("average rate = "); Serial.print(1.0f/deltat, 2); Serial.println(" Hz");
@@ -208,7 +208,7 @@ void loop()
 //    Serial.print((int)(roll));
 //    Serial.println(" ypr");
 
-    Serial.print("rt: "); Serial.print(1.0f / deltat, 2); Serial.println(" Hz");
+//    Serial.print("rt: "); Serial.print(1.0f / deltat, 2); Serial.println(" Hz");
 
     blinkOn = ~blinkOn;
     count = millis();
