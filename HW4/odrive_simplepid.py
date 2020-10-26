@@ -1,24 +1,10 @@
 import os
 import sys
 import time
-import smbus
 import odrive
 
-from imusensor.MPU9250 import MPU9250
-from imusensor.filters import madgwick
-
-sensorfusion = madgwick.Madgwick(0.5)
-
-address = 0x68
-bus = smbus.SMBus(1)
-imu = MPU9250.MPU9250(bus, address)
-imu.begin()
-
-# imu.caliberateGyro()
-# imu.caliberateAccelerometer()
-# or load your own caliberation file
-#imu.loadCalibDataFromFile("/home/pi/calib_real4.json")
-
+import serial
+from simple_pid import PID
 
 odrv0 = odrive.find_any()
 my_motor = odrv0.axis0
@@ -34,43 +20,44 @@ time.sleep(15)
 my_motor.requested_state = 8 # AXIS_STATE_CLOSED_LOOP_CONTROL
 
 # run motor at velocity mode (incremental speed)
-my_motor.controller.config.control_mode = 3 # position control
+my_motor.controller.config.vel_limit = 12
+my_motor.controller.config.control_mode = 2 # velocity control
 
-# first slowly move the motor back to zero pos
-my_motor.controller.config.vel_limit = 1
-my_motor.controller.input_pos = 0
-time.sleep(5)
-my_motor.controller.config.vel_limit = 3
-my_motor.controller.config.control_mode = 1 # velocity control
+kp = 0.35
+ki = 0.001
+kd = 0.0
+pid = PID(kp, ki, kd, 0)
+pid.sample_time = 0.01
 
-target = 72
-currTime = time.time()
-startTime = currTime
-print_count = 0
-my_motor.requested_state = 1
-while True:
-	imu.readSensor()
-	for i in range(10):
-		newTime = time.time()
-		dt = newTime - currTime
-		currTime = newTime
-
-		sensorfusion.updateRollPitchYaw(imu.AccelVals[0], imu.AccelVals[1], imu.AccelVals[2], imu.GyroVals[0], \
-									imu.GyroVals[1], imu.GyroVals[2], imu.MagVals[0], imu.MagVals[1], imu.MagVals[2], dt)
-
-	if print_count == 2:
-		# print ("mad roll: {0} ; mad pitch : {1} ; mad yaw : {2}".format(sensorfusion.roll, sensorfusion.pitch, sensorfusion.yaw))
-		theta = sensorfusion.yaw
-		print_count = 0
-		if time.time() - startTime > 10:
-			print(theta)
-			# error = theta - target
-			# vel = 0.01 * error
-			# print(vel)
-			# my_motor.requested_state = 8
-			# # my_motor.controller.input_vel = vel
-			# my_motor.requested_state = 1
+s = serial.Serial('/dev/ttyACM1', baudrate = 9600, timeout = 0)
+s.readline()
+s.reset_input_buffer()
 
 
-	print_count = print_count + 1
-	time.sleep(0.01)
+# target = 0
+# start = time.time()
+# theta_prev = 0
+# theta_sum = 0
+
+while 1:
+	try:
+		val = s.readline().decode()
+		try:
+			theta = float(val)
+			if theta >= 30 or theta <= -30:
+				my_motor.requested_state = 1
+				break
+			# print(theta)
+		except:
+			continue
+
+		output = pid(theta)
+		print(output)
+
+		my_motor.controller.input_vel = output
+
+		# time.sleep(0.01)
+	except KeyboardInterrupt:
+		my_motor.controller.input_vel = 0
+		my_motor.requested_state = 1
+		break

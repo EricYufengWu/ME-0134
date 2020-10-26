@@ -35,7 +35,7 @@ while True:
     acc = mpu.acceleration
     fuse.update_nomag(acc, gyro, ts = lambda : time.time()) # Note blocking mag read
     if count % 1 == 0:
-        print("Heading, Pitch, Roll: {:7.3f} {:7.3f} {:7.3f}".format(gyro[0], gyro[1], gyro[2]))
+        # print("Heading, Pitch, Roll: {:7.3f} {:7.3f} {:7.3f}".format(gyro[0], gyro[1], gyro[2]))
         print("Heading, Pitch, Roll: {:7.3f} {:7.3f} {:7.3f}".format(fuse.heading, fuse.pitch, fuse.roll))
     time.sleep(0.02)
     count += 1
