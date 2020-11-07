@@ -5,36 +5,13 @@ points P1[x,y,z]and P2[x,y,z] on a sphere of radius R,and draws a line on the
 sphere between them. The code should output a 3D plot showing the 3D 
 line. Upload the code file (make sure to include comments) with your midterm 
 (we will change both the points and radius andrun it–it must work).
-
-DISCLAIMER: I wrote the cartesian and spherical conversion functions with 
-help from the internet. I also got help from the internet to write the 
-command to generate the referenced wireframe sphere.
 '''
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
-from sympy import *
-
-def asCartesian(rthetaphi):
-    #takes list rthetaphi (single coord)
-    r       = rthetaphi[0]
-    theta   = rthetaphi[1]* pi/180 # to radian
-    phi     = rthetaphi[2]* pi/180
-    x = r * sin( theta ) * cos( phi )
-    y = r * sin( theta ) * sin( phi )
-    z = r * cos( theta )
-    return [x,y,z]
-
-def asSpherical(xyz):
-    #takes list xyz (single coord)
-    x       = xyz[0]
-    y       = xyz[1]
-    z       = xyz[2]
-    r       =  sqrt(x*x + y*y + z*z)
-    theta   =  acos(z/r)*180/ pi #to degrees
-    phi     =  atan2(y,x)*180/ pi
-    return [r,theta,phi]
+from astropy import coordinates
+from math import pi
 
 def prompt():
 	r = input('radius of sphere: ')
@@ -52,25 +29,24 @@ rez = 100
 r, A, B = prompt()
 
 # convert cartesian inputs to spherical coordinates for easy processing
-sA = asSpherical(A)
-sB = asSpherical(B)
-
-for coord in [sA,sB]:
-	for i in range(len(coord)):
-		if coord[i] == nan:
-			coord[i] = 0
+sA = coordinates.cartesian_to_spherical(A[0],A[1],A[2])
+sB = coordinates.cartesian_to_spherical(B[0],B[1],B[2])
+sA = np.asarray([sA[0].value, sA[1].value, sA[2].value])
+sB = np.asarray([sB[0].value, sB[1].value, sB[2].value])
+# print(sA, sB)
 
 # create incremental spherical coordinates across the two points
-rs = np.linspace(float(sA[0]), float(sB[0]), rez)
-thetas = np.linspace(float(sA[1]), float(sB[1]), rez)
-phis = np.linspace(float(sA[2]), float(sB[2]), rez)
+rs = np.linspace(sA[0], sB[0], rez)
+thetas = np.linspace(sA[2], sB[2], rez)
+phis = np.linspace(sA[1], sB[1], rez)
+# print("theta; ", thetas)
+# print("phi: ", phis)
 
 # Convert back to cartesian
 points = []
 for p in range(rez):
-	sph_coord = [rs[p], thetas[p], phis[p]]
-	cart_coord = asCartesian(sph_coord)
-	points.append([float(cart_coord[0]),float(cart_coord[1]),float(cart_coord[2])])
+	cart_coord = coordinates.spherical_to_cartesian(rs[p], phis[p], thetas[p])
+	points.append([float(cart_coord[0].value),float(cart_coord[1].value),float(cart_coord[2].value)])
 
 coords = np.asarray(points)
 
