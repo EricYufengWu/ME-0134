@@ -20,7 +20,7 @@ time.sleep(15)
 my_motor.requested_state = 8 # AXIS_STATE_CLOSED_LOOP_CONTROL
 
 # run motor at velocity mode (incremental speed)
-my_motor.controller.config.vel_limit = 12
+my_motor.controller.config.vel_limit = 18
 my_motor.controller.config.control_mode = 2 # velocity control
 
 kp = 0.35
@@ -29,7 +29,7 @@ kd = 0.0
 pid = PID(kp, ki, kd, 0)
 pid.sample_time = 0.01
 
-s = serial.Serial('/dev/ttyACM1', baudrate = 9600, timeout = 0)
+s = serial.Serial('/dev/ttyACM0', baudrate = 9600, timeout = 0)
 s.readline()
 s.reset_input_buffer()
 
@@ -44,7 +44,7 @@ while 1:
 		val = s.readline().decode()
 		try:
 			theta = float(val)
-			if theta >= 30 or theta <= -30:
+			if theta >= 50 or theta <= -50:
 				my_motor.requested_state = 1
 				break
 			# print(theta)

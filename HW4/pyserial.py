@@ -8,7 +8,7 @@ kd = 0
 pid = PID(kp, ki, kd, 0)
 pid.sample_time = 0.01
 
-s = serial.Serial('/dev/ttyACM1', baudrate = 9600)
+s = serial.Serial('/dev/ttyACM0', baudrate = 9600)
 s.readline()
 s.reset_input_buffer()
 

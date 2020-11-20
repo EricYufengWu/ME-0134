@@ -6,7 +6,7 @@ import numpy as np
 
 max_val = 50
 z_draw_height = -220
-z_offset = 0
+z_offset = 5
 
 delta = DeltaKinematics()
 bot = DeltaMotion(c_down = 36)
@@ -44,9 +44,9 @@ coord[:,2] += z_offset
 for points in coord:
 	bot.move_robot(delta.inverse_kinematics(points[0], points[1], points[2]))
 	# print(points)
-	time.sleep(0.2)
+	time.sleep(0.1)
 
 ### Finish. Now perform a little dance?
 time.sleep(1)
 bot.move_all(30)
-
+bot.clamp_up()
