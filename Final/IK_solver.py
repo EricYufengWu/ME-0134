@@ -31,5 +31,7 @@ class hex_IK:
 		r = x0 / math.cos(theta_c)
 		theta_f = math.pi/2 - math.atan((r-self.C)/y0) - math.acos((pow(self.F,2) + y0*y0 + pow((r - self.C),2) - pow(self.T,2)) / (2 * self.F * math.sqrt(y0*y0 + pow((r - self.C),2))))
 
+		theta_t = 0
+
 		print(math.degrees(theta_c), math.degrees(theta_f))
-		return 
+		return [theta_c, theta_f, theta_t]
