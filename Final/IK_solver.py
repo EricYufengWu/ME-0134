@@ -30,15 +30,12 @@ class hex_IK:
 		return x,y,z
 
 	def inverse_k(self, x, y, z):
-
-		x0, y0, z0 = trans_coord(x,y,z)
+		x0, y0, z0 = self.trans_coord(x,y,z)
 
 		theta_c = math.atan(z0/x0)
-
 		r = x0 / math.cos(theta_c)
 		theta_f = math.pi/2 - math.atan((r-self.C)/y0) - math.acos((pow(self.F,2) + y0*y0 + pow((r - self.C),2) - pow(self.T,2)) / (2 * self.F * math.sqrt(y0*y0 + pow((r - self.C),2))))
+		theta_t = math.pi - math.acos((pow(self.F,2) + pow(self.T,2) - y0*y0 - pow((r - self.C),2)) / (2 * self.F * self.T)) # Write stuff here
 
-		theta_t = 0 # Write stuff here
-
-		print(math.degrees(theta_c), math.degrees(theta_f))
-		return [theta_c, theta_f, theta_t]
+		print(math.degrees(theta_c), math.degrees(theta_f), math.degrees(theta_t))
+		return [math.degrees(theta_c), math.degrees(theta_f), math.degrees(theta_t)]
