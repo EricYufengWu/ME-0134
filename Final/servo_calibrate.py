@@ -30,8 +30,10 @@ def home():
         kit_1.servo[i].angle = 90
         kit_2.servo[i].angle = 90
 
+
 set_range()
 
 while 1:
     home()
+    print("homing")
     time.sleep(0.1)

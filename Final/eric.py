@@ -1,7 +1,7 @@
 from hex import *
 
 #Eric's Code
-lower_pos = np.asarray([120,30,30,    #FL
+low_pos = np.asarray([120,30,30,    #FL
                         90,30,30,    #ML
                         60,30,30,    #FR
                         90,30,30,    #MR
@@ -19,7 +19,7 @@ level_pos = np.asarray([120,90,90,    #FL
                         90,90,90,    #MR
                         60,90,90,    #BL
                         120,90,90])    #BR
-level_L_pos = np.asarray([120,80,80,    #FL
+lower_pos = np.asarray([120,80,80,    #FL
                         90,80,80,    #ML
                         60,80,80,    #FR
                         90,80,80,    #MR
@@ -42,9 +42,8 @@ def go_pos(pos_list):
             drivers[joint.driver].servo[joint.channel].angle = pos_list[count]
             joint.currAng = pos_list[count]
             count += 1
-    sleep(1)
 
-def ramp_pos(pos_list,rez = 50):
+def ramp_pos(pos_list, rez = 50,waittime = 0.01):
     count = 0
     prev_list = np.zeros(18)
     for leg in LEGS:
@@ -63,13 +62,15 @@ def ramp_pos(pos_list,rez = 50):
     for step in ramp:
         print(step)
         go_pos(step)
-        sleep(0.02)
+        sleep(waittime)
 
 def jump():
     go_pos(level_pos)
     sleep(1)
     for i in range(20):
-        go_pos(level_L_pos)
+        go_pos(lower_pos)
+        print("down")
         sleep(0.1)
         go_pos(level_pos)
+        print("up")
         sleep(0.1)
