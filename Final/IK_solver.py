@@ -9,10 +9,12 @@ Base Coordinate System:
 	|
 	Y ---> X  
 Y into the page, Z is the direction of movement
+
 Each leg has their coord origin located at the point of rotation of their coxia (rotating joint)
 When defining the legs, an x,y,z coord is required to set up the start pos of each leg with offset.
 Later commands will be simply shifting the positions of each leg from its start position.
 for example, if I want the FR leg to move 10mm in z, do leg.inverse_k(0,0,10)
+
 Current start pos:
 front left: x0 = -50, y0 = 100, z0 = 50
 front right: x0 = 50, y0 = 100, z0 = 50
@@ -20,6 +22,7 @@ mid left: x0 = -50, y0 = 100, z0 = 0
 mid right: x0 = 50, y0 = 100, z0 = 0
 back left: x0 = -50, y0 = 100, z0 = -50
 back right: x0 = 50, y0 = 100, z0 = -50
+
 For more info on the coord setup, checkout the jpeg images under https://github.com/EricYufengWu/ME-0134/tree/master/Final/IK_images
 Website reference for IK calculation: https://hexyrobot.wordpress.com/2015/11/20/hexapod-leg-kinematics/
 '''
