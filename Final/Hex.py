@@ -2,6 +2,7 @@ from Joint import Joint
 from Leg import Leg
 from adafruit_servokit import ServoKit
 from time import sleep
+import numpy as np
 
 class Hex:
     def __init__(self):
@@ -42,6 +43,8 @@ class Hex:
         self.LEGS = [self.FL, self.ML, self.BL, self.FR, self.MR, self.BR]
         self.LEGS_L = [self.FL,  75, self.ML, 45, self.BL, 15]
         self.LEGS_R = [self.FR, 15, self.MR, 45, self.BR, 75]
+        self.Tri_A = [self.FR, self.ML, self.BR]
+        self.Tri_B = [self.FL, self.MR, self.BL]
 
 
         # Create the drivers 
@@ -50,6 +53,11 @@ class Hex:
         self.drivers = [self.kit_1, self.kit_2]
         print('Initialized the drivers...')  
       
+        # interpolate xyz
+        self.x = -20
+        self.y = 0
+        self.z = -20
+
         # Set ranges and home the system
         self.set_ranges()
         self.home()
@@ -66,10 +74,11 @@ class Hex:
             for joint in leg.joints:
                 self.drivers[joint.driver].servo[joint.channel].angle = joint.startAng
         sleep(1)
+        self.goTo(-20,0,-20,self.LEGS)
     
-    def goTo(self, x, y, z):
+    def goTo(self, x, y, z, cluster):
         
-        for leg in self.LEGS:
+        for leg in cluster:
             print('Calculating the new positions')
             leg.inverse_k(x,y,z)
         
@@ -81,5 +90,43 @@ class Hex:
 
             # Directly controls the ROTATE axis
             self.drivers[leg.joints[0].driver].servo[leg.joints[0].channel].angle = leg.joints[0].goAng + leg.rotate_offset
+        self.x = x
+        self.y = y
+        self.z = z
+
+
+    def interpolate_xyz(self,x,y,z, cluster, rez = 50):
+
+        x_range = np.linspace(self.x, x, rez)
+        y_range = np.linspace(self.y, y, rez)
+        z_range = np.linspace(self.z, z, rez)
+        print(y_range)
+        for i in range(rez):
+            self.goTo(x_range[i], y_range[i], z_range[i], cluster)
         
 
+
+    def move(self, x, y, z):
+        for leg in self.LEGS:
+            leg.inverse_k(x,y,z)
+            for i,joint in enumerate(leg.joints):
+                joint.interpolate()
+                for angle in joint.angle_sweep:
+                    
+                    if i == 0:
+                        self.drivers[leg.joints[i].driver].servo[leg.joints[i].channel].angle = angle + leg.rotate_offset   
+                    elif i == 1:
+                        self.drivers[leg.joints[i].driver].servo[leg.joints[i].channel].angle = angle + 70
+                    else:
+                        self.drivers[leg.joints[i].driver].servo[leg.joints[i].channel].angle = 180 - angle
+
+                    print(i)
+
+
+        # for leg in self.LEGS:
+        #         for angle in leg.joints.angle_sweep:
+        #             self.drivers[joint[0].driver].servo[joint[0].channel].angle = angle + leg.rotate_offset
+        #             self.drivers[leg.joints[1].driver].servo[leg.joints[1].channel].angle = angle + 70
+
+
+        
