@@ -40,11 +40,11 @@ class Hex:
         self.BR = Leg(self.JOINT16, self.JOINT17, self.JOINT18, rotate_offset = 75)
         print('Assigned legs...')
         # Leg assigments and rotation offsets 
-        self.LEGS = [self.FL, self.ML, self.BL, self.FR, self.MR, self.BR]
+        self.LEGS = [ (self.FL, 0), (self.ML,0), (self.BL,0), (self.FR, 0), (self.MR, 0), (self.BR, 0)]
         self.LEGS_L = [self.FL,  75, self.ML, 45, self.BL, 15]
         self.LEGS_R = [self.FR, 15, self.MR, 45, self.BR, 75]
-        self.Tri_A = [self.FR, self.ML, self.BR]
-        self.Tri_B = [self.FL, self.MR, self.BL]
+        self.TRI_A = [(self.FR, 0), (self.ML, 180), (self.BR, 0) ]
+        self.TRI_B = [(self.FL, 0), (self.MR, 180), (self.BL, 0) ]
 
 
         # Create the drivers 
@@ -66,50 +66,57 @@ class Hex:
 
     def set_ranges(self):
         for leg in self.LEGS:
-            for joint in leg.joints:
+            for joint in leg[0].joints:
                 self.drivers[joint.driver].servo[joint.channel].set_pulse_width_range(joint.minPW, joint.maxPW)
 
     def home(self):
         for leg in self.LEGS:
-            for joint in leg.joints:
+            for joint in leg[0].joints:
                 self.drivers[joint.driver].servo[joint.channel].angle = joint.startAng
         sleep(1)
         self.goTo(-20,0,-20,self.LEGS)
     
     def goTo(self, x, y, z, cluster):
-        
         for leg in cluster:
-            print('Calculating the new positions')
-            leg.inverse_k(x,y,z)
+            # print('Calculating the new positions')
+            leg[0].inverse_k(x,y,z)
+            leg[0].curr_x = x
+            leg[0].curr_y = y
+            leg[0].curr_z = z
         
             # Directly controls the KNEE axis
-            self.drivers[leg.joints[1].driver].servo[leg.joints[1].channel].angle = leg.joints[1].goAng + 70
+            self.drivers[leg[0].joints[1].driver].servo[leg[0].joints[1].channel].angle = leg[0].joints[1].goAng + 70
 
             # Direcly controls the ANKLE axis
-            self.drivers[leg.joints[2].driver].servo[leg.joints[2].channel].angle = 180 - leg.joints[2].goAng
+            self.drivers[leg[0].joints[2].driver].servo[leg[0].joints[2].channel].angle = 180 - leg[0].joints[2].goAng
 
-            # Directly controls the ROTATE axis
-            self.drivers[leg.joints[0].driver].servo[leg.joints[0].channel].angle = leg.joints[0].goAng + leg.rotate_offset
-        self.x = x
-        self.y = y
-        self.z = z
+            if leg[1] == 180:
+                # Directly controls the ROTATE axis
+                self.drivers[leg[0].joints[0].driver].servo[leg[0].joints[0].channel].angle = leg[1] - (leg[0].joints[0].goAng + leg[0].rotate_offset)
+            else:
+                self.drivers[leg[0].joints[0].driver].servo[leg[0].joints[0].channel].angle = (leg[0].joints[0].goAng + leg[0].rotate_offset)
 
 
     def interpolate_xyz(self,x,y,z, cluster, rez = 50):
-
-        x_range = np.linspace(self.x, x, rez)
-        y_range = np.linspace(self.y, y, rez)
-        z_range = np.linspace(self.z, z, rez)
-        print(y_range)
+        x_range = []
+        y_range = []
+        z_range = []
+        for i,leg in enumerate(cluster):
+            x_range.append(np.linspace(leg[0].curr_x, x, rez))
+            y_range.append(np.linspace(leg[0].curr_y, y, rez))
+            z_range.append(np.linspace(leg[0].curr_z, z, rez))
+        # x_range = np.linspace(self.x, x, rez)
+        # y_range = np.linspace(self.y, y, rez)
+        # z_range = np.linspace(self.z, z, rez)
+        # print(y_range)
         for i in range(rez):
-            self.goTo(x_range[i], y_range[i], z_range[i], cluster)
-        
+            self.goTo(x_range[0][i], y_range[0][i], z_range[0][i], cluster)
 
 
     def move(self, x, y, z):
         for leg in self.LEGS:
-            leg.inverse_k(x,y,z)
-            for i,joint in enumerate(leg.joints):
+            leg[0].inverse_k(x,y,z)
+            for i,joint in enumerate(leg[0].joints):
                 joint.interpolate()
                 for angle in joint.angle_sweep:
                     
@@ -121,6 +128,24 @@ class Hex:
                         self.drivers[leg.joints[i].driver].servo[leg.joints[i].channel].angle = 180 - angle
 
                     print(i)
+
+    def step(self):
+        self.interpolate_xyz(-20, 30, -20, self.LEGS)
+        sleep(0.5)
+        for i in range(5):
+            self.interpolate_xyz(-20, 0, -20, self.TRI_A) # Lift up
+            self.interpolate_xyz(-20, 30, 0, self.TRI_B)
+            self.interpolate_xyz(-20, 0, 0, self.TRI_A) # TriA moving forward
+            self.interpolate_xyz(-20, 30, 0, self.TRI_A)
+            # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
+            sleep(0.5)
+            self.interpolate_xyz(-20, 0, -20, self.TRI_B)
+            self.interpolate_xyz(-20, 30, -20, self.TRI_A)
+            self.interpolate_xyz(-20, 0, 0, self.TRI_B)
+            self.interpolate_xyz(-20, 30, 0, self.TRI_B)
+            sleep(0.5)
+
+
 
 
         # for leg in self.LEGS:

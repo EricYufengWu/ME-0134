@@ -10,6 +10,10 @@ class Leg:
         self.x0 = x0
         self.y0 = y0
         self.z0 = z0
+        self.curr_x = -20
+        self.curr_y = 0
+        self.curr_z = -20
+
 
         self.rotate_offset = rotate_offset
 
@@ -26,7 +30,7 @@ class Leg:
 
     def inverse_k(self, x_offs=0, y_offs=0, z_offs=0):
         x, y, z = self.trans_coord(x_offs,y_offs,z_offs)
-        print("solving IK for: ", x, y, z)
+        # print("solving IK for: ", x, y, z)
 
         # Update joint variable for interpolation between points
         self.joints[0].currAng = self.joints[0].goAng
