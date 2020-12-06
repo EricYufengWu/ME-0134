@@ -32,17 +32,19 @@ class Hex:
         print('Assigned joints...')                
         # Leg creation
 
-        self.FL = Leg(self.JOINT1, self.JOINT2, self.JOINT3, rotate_offset = 85)
+        self.FL = Leg(self.JOINT1, self.JOINT2, self.JOINT3, rotate_offset = 75)
         self.ML = Leg(self.JOINT4, self.JOINT5, self.JOINT6, rotate_offset = 45)
-        self.FR = Leg(self.JOINT7, self.JOINT8, self.JOINT9, rotate_offset = 5)
+        self.FR = Leg(self.JOINT7, self.JOINT8, self.JOINT9, rotate_offset = 15)
         self.MR = Leg(self.JOINT10, self.JOINT11, self.JOINT12, rotate_offset = 45)
-        self.BL = Leg(self.JOINT13, self.JOINT14, self.JOINT15, rotate_offset = 5)
-        self.BR = Leg(self.JOINT16, self.JOINT17, self.JOINT18, rotate_offset = 85)
+        self.BL = Leg(self.JOINT13, self.JOINT14, self.JOINT15, rotate_offset = 15)
+        self.BR = Leg(self.JOINT16, self.JOINT17, self.JOINT18, rotate_offset = 75)
         print('Assigned legs...')
         # Leg assigments and rotation offsets 
         self.LEGS = [ (self.FL, 0), (self.ML,0), (self.BL,0), (self.FR, 0), (self.MR, 0), (self.BR, 0)]
-        self.LEGS_L = [self.FL,  75, self.ML, 45, self.BL, 15]
-        self.LEGS_R = [self.FR, 15, self.MR, 45, self.BR, 75]
+        #self.LEGS_L = [ self.FL,  75, self.ML, 45, self.BL, 15]
+        #self.LEGS_R = [self.FR, 15, self.MR, 45, self.BR, 75]
+        self.LEGS_L = [ (self.FL,  0), (self.ML, 0), (self.BL, 0) ]
+        self.LEGS_R = [ (self.FR, 0), (self.MR, 0), (self.BR, 0) ]
         self.TRI_A = [(self.FR, 0), (self.ML, 180), (self.BR, 0) ]
         self.TRI_B = [(self.FL, 0), (self.MR, 180), (self.BL, 0) ]
 
@@ -112,7 +114,7 @@ class Hex:
         # print(y_range)
         for i in range(rez):
             self.goTo(x_range[0][i], y_range[0][i], z_range[0][i], cluster)
-            sleep(0.01)
+            sleep(0.001)
 
 
     def move(self, x, y, z):
@@ -135,17 +137,19 @@ class Hex:
         self.interpolate_xyz(-20, 30, -20, self.LEGS)
         sleep(0.5)
         for i in range(5):
-            self.interpolate_xyz(-20, 0, -20, self.TRI_A) # Lift up
-            self.interpolate_xyz(-20, 30, -20, self.TRI_B)
-            self.interpolate_xyz(-20, 0, 0, self.TRI_A) # TriA moving forward
-            self.interpolate_xyz(-20, 30, 0, self.TRI_A)
+            self.interpolate_xyz(-20, 0, -30, self.TRI_A) # Lift up
+            self.interpolate_xyz(-20, 30, -10, self.TRI_B)
+            sleep(0.1)
+            self.interpolate_xyz(-20, 0, -10, self.TRI_A) # TriA moving forward
+            self.interpolate_xyz(-20, 30, -10, self.TRI_A)
             # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
-            sleep(0.5)
-            self.interpolate_xyz(-20, 0, -20, self.TRI_B)
-            self.interpolate_xyz(-20, 30, -20, self.TRI_A)
-            self.interpolate_xyz(-20, 0, -40, self.TRI_B)
-            self.interpolate_xyz(-20, 30, -40, self.TRI_B)
-            sleep(0.5)
+            sleep(0.1)
+            self.interpolate_xyz(-20, 0, -10, self.TRI_B)
+            self.interpolate_xyz(-20, 30, -30, self.TRI_A)
+            sleep(0.1)
+            self.interpolate_xyz(-20, 0, -30, self.TRI_B)
+            self.interpolate_xyz(-20, 30, -30, self.TRI_B)
+            sleep(0.1)
 
     def step_low(self):
         self.interpolate_xyz(-40, 30, -40, self.LEGS)
@@ -153,17 +157,35 @@ class Hex:
         for i in range(5):
             self.interpolate_xyz(-40, -10, -40, self.TRI_A) # Lift up
             self.interpolate_xyz(-40, 10, -40, self.TRI_B)
-            sleep(0.5)
-            self.interpolate_xyz(-40, -10, 0, self.TRI_A) # TriA moving forward
-            self.interpolate_xyz(-40, 10, 0, self.TRI_A)
+            self.interpolate_xyz(-40, -10, -20, self.TRI_A) # TriA moving forward
+            self.interpolate_xyz(-40, 10, -20, self.TRI_A)
             # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
             sleep(0.5)
             self.interpolate_xyz(-40, -10, -40, self.TRI_B)
             self.interpolate_xyz(-40, 10, -40, self.TRI_A)
+            self.interpolate_xyz(-40, -10, -60, self.TRI_B)
+            self.interpolate_xyz(-40, 10, -60, self.TRI_B)
             sleep(0.5)
-            self.interpolate_xyz(-40, -10, 0, self.TRI_B)
-            self.interpolate_xyz(-40, 10, 0, self.TRI_B)
+
+    def step_left(self, hi_low = 1):
+        if hi_low == 0:
+            hl_offset = 0
+        elif hi_low == 1:
+            hl_offset = -20
+        self.interpolate_xyz(-40, 30, -40, self.LEGS)
+        sleep(0.5)
+        for i in range(5):
+            self.interpolate_xyz(-40, -10, -40, self.LEGS_L) # Lift up
+            self.interpolate_xyz(-40, -10, -20, self.LEGS_L)
+            self.interpolate_xyz(-40, 10, -20, self.TRI_A)
+            # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
             sleep(0.5)
+            self.interpolate_xyz(-40, -10, -40, self.TRI_B)
+            self.interpolate_xyz(-40, 10, -40, self.TRI_A)
+            self.interpolate_xyz(-40, -10, -60, self.TRI_B)
+            self.interpolate_xyz(-40, 10, -60, self.TRI_B)
+            sleep(0.5)
+
 
 
 
