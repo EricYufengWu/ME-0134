@@ -12,24 +12,24 @@ class Hex:
 
         # Joints creation
 
-        self.JOINT1 = Joint(0, 0, 400, 2500, 120, inverted = True)
+        self.JOINT1 = Joint(0, 0, 500, 2600, 120, inverted = True)
         self.JOINT2 = Joint(0, 1, 400, 2500, 30)
         self.JOINT3 = Joint(0, 2, 450, 2550, 30)
-        self.JOINT4 = Joint(0, 4, 350, 2450, 90, inverted = True)
+        self.JOINT4 = Joint(0, 4, 450, 2550, 90, inverted = True)
         self.JOINT5 = Joint(0, 5, 380, 2480, 30)
-        self.JOINT6 = Joint(0, 6, 450, 2550, 30)
-        self.JOINT7 = Joint(0, 8, 300, 2400, 60)
+        self.JOINT6 = Joint(0, 6, 400, 2500, 30)
+        self.JOINT7 = Joint(0, 8, 450, 2550, 60)
         self.JOINT8 = Joint(0, 9, 320, 2520, 30)
         self.JOINT9 = Joint(0, 10, 300, 2400, 30)
-        self.JOINT10 = Joint(0, 12, 250, 2350, 90)
+        self.JOINT10 = Joint(0, 12, 350, 2450, 90)
         self.JOINT11 = Joint(0, 13, 400, 2500, 30)
         self.JOINT12 = Joint(0, 14, 400, 2500, 30)
         self.JOINT13 = Joint(1, 0, 300, 2400, 60, inverted = True)
         self.JOINT14 = Joint(1, 1, 350, 2450, 30)
         self.JOINT15 = Joint(1, 2, 500, 2600, 30)
         self.JOINT16 = Joint(1, 12, 550, 2650, 120)
-        self.JOINT17 = Joint(1, 13, 500, 2600, 30)
-        self.JOINT18 = Joint(1, 14, 500, 2600, 30)
+        self.JOINT17 = Joint(1, 13, 400, 2500, 30)
+        self.JOINT18 = Joint(1, 14, 400, 2500, 30)
         # LIDAR
         self.JOINT19 = Joint(1, 7, 400, 2600, 90)
         print('Assigned joints...')                
@@ -53,10 +53,6 @@ class Hex:
         self.ROT_TRI_A = [(self.FR, 0), (self.ML, 0), (self.BR, 0) ]
         self.ROT_TRI_B = [(self.FL, 0), (self.MR, 0), (self.BL, 0) ]
         self.LEG = [(self.FL, 0), (self.FR, 180)]
-        self.FRONT = [(self.FR,0),(self.FL,0)]
-        self.MID = [(self.MR,180),(self.ML,180)]
-        self.BACK = [(self.BR,0),(self.BL,0)]
-
 
 
         # Create the drivers 
@@ -73,7 +69,6 @@ class Hex:
         # Set ranges and home the system
         self.set_ranges()
         self.home()
-        # self.calibrate()
         print('Homed the system!')
         print('')
 
@@ -95,13 +90,6 @@ class Hex:
         # home the LIDAR
         self.drivers[self.JOINT19.driver].servo[self.JOINT19.channel].angle = 90
         self.goTo(-20,0,-20,self.LEGS)
-
-    def calibrate(self):
-        for leg in self.LEGS:
-            for joint in leg[0].joints:
-                self.drivers[joint.driver].servo[joint.channel].angle = 90
-        sleep(1)
-        
     
     def goTo(self, x, y, z, cluster):
         for leg in cluster:
@@ -158,47 +146,22 @@ class Hex:
 
     #                 print(i)
 
-    def step_high(self, step = 5):
+    def step_high(self):
         self.interpolate_xyz(-20, 30, -20, self.LEGS)
         sleep(0.5)
-        for i in range(step):
-            self.interpolate_xyz(-20, -10, -30, self.TRI_A) # Lift up
+        for i in range(5):
+            self.interpolate_xyz(-20, 0, -30, self.TRI_A) # Lift up
             self.interpolate_xyz(-20, 30, -10, self.TRI_B)
             sleep(0.1)
-            self.interpolate_xyz(-20, -10, -10, self.TRI_A) # TriA moving forward
+            self.interpolate_xyz(-20, 0, -10, self.TRI_A) # TriA moving forward
             self.interpolate_xyz(-20, 30, -10, self.TRI_A)
             # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
             sleep(0.1)
-            self.interpolate_xyz(-20, -10, -10, self.TRI_B)
+            self.interpolate_xyz(-20, 0, -10, self.TRI_B)
             self.interpolate_xyz(-20, 30, -30, self.TRI_A)
             sleep(0.1)
-            self.interpolate_xyz(-20, -10, -30, self.TRI_B)
+            self.interpolate_xyz(-20, 0, -30, self.TRI_B)
             self.interpolate_xyz(-20, 30, -30, self.TRI_B)
-            sleep(0.1)
-
-    def step_low_tunnel(self,step = 1):
-        self.interpolate_xyz(-20, 30, -20, self.LEGS)
-        sleep(0.5)
-        for i in range(step):
-            self.interpolate_xyz(20, 0, 0, self.TRI_A) # Lift up
-            self.interpolate_xyz(-20, 30, -10, self.TRI_B)
-            sleep(0.1)
-            self.interpolate_xyz(-20, -10, -10, self.TRI_A) # TriA moving forward
-            self.interpolate_xyz(-20, 30, -10, self.TRI_A)
-            # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
-            sleep(0.1)
-            self.interpolate_xyz(-20, -10, -10, self.TRI_B)
-            self.interpolate_xyz(-20, 30, -30, self.TRI_A)
-            sleep(0.1)
-            self.interpolate_xyz(-20, -10, -30, self.TRI_B)
-            self.interpolate_xyz(-20, 30, -30, self.TRI_B)
-            sleep(0.1)
-
-    def step_high_combined(self, step = 1):
-        for i in range(step):
-            self.step_high(3)
-            sleep(0.1)
-            self.rotate_right()
             sleep(0.1)
     
     def climb(self):
@@ -207,7 +170,7 @@ class Hex:
         self.drivers[self.JOINT7.driver].servo[self.JOINT7.channel].angle = 10
 
 
-    def rotate_left(self, step = 2):
+    def rotate_left(self):
 	# Turns 90 degrees left
         self.interpolate_xyz(-20, 30, -20, self.LEGS)
         sleep(0.5)
@@ -215,7 +178,7 @@ class Hex:
         self.interpolate_xyz(-20, 0, -40, self.ROT_TRI_A)
         sleep(0.1)
         self.interpolate_xyz(-20,30, -40, self.ROT_TRI_A)
-        for i in range(step):
+        for i in range(2):
             self.interpolate_xyz(-20, 0, -30, self.ROT_TRI_B) # Lift up
             self.interpolate_xyz(-20, 0, -40, self.ROT_TRI_B)
             sleep(0.1)
@@ -229,7 +192,7 @@ class Hex:
             self.interpolate_xyz(-20, 30, -40, self.ROT_TRI_A)
             sleep(0.1)
     
-    def rotate_right(self, step = 2):
+    def rotate_right(self):
         # Turns 90 degrees right
         self.interpolate_xyz(-20, 30, -20, self.LEGS)
         sleep(0.5)
@@ -237,7 +200,7 @@ class Hex:
         self.interpolate_xyz(-20, 0, 0, self.ROT_TRI_A)
         sleep(0.1)
         self.interpolate_xyz(-20,30, 0, self.ROT_TRI_A)
-        for i in range(step):
+        for i in range(2):
             self.interpolate_xyz(-20, 0, -20, self.ROT_TRI_B) # Lift up
             self.interpolate_xyz(-20, 0, 0, self.ROT_TRI_B)
             sleep(0.1)
@@ -253,24 +216,20 @@ class Hex:
     
     def step_low(self):
         # currently unstable
-        self.interpolate_xyz(0,0,0, self.LEGS)
-
-        #self.interpolate_xyz(-40, 30, -40, self.LEGS)
-        #sleep(0.5)
-        #for i in range(5):
-        #    self.interpolate_xyz(-40, -10, -40, self.TRI_A) # Lift up
-        #    self.interpolate_xyz(-40, 10, -40, self.TRI_B)
-        #    self.interpolate_xyz(-40, -10, -20, self.TRI_A) # TriA moving forward
-        #    self.interpolate_xyz(-40, 10, -20, self.TRI_A)
+        self.interpolate_xyz(-40, 30, -40, self.LEGS)
+        sleep(0.5)
+        for i in range(5):
+            self.interpolate_xyz(-40, -10, -40, self.TRI_A) # Lift up
+            self.interpolate_xyz(-40, 10, -40, self.TRI_B)
+            self.interpolate_xyz(-40, -10, -20, self.TRI_A) # TriA moving forward
+            self.interpolate_xyz(-40, 10, -20, self.TRI_A)
             # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
-        #    sleep(0.5)
-        #    self.interpolate_xyz(-40, -10, -40, self.TRI_B)
-        #    self.interpolate_xyz(-40, 10, -40, self.TRI_A)
-            #self.interpolate_xyz(-40, -10, -60, self.TRI_B)
-            #self.interpolate_xyz(-40, 10, -60, self.TRI_B)
-        #    sleep(0.5)
-
-
+            sleep(0.5)
+            self.interpolate_xyz(-40, -10, -40, self.TRI_B)
+            self.interpolate_xyz(-40, 10, -40, self.TRI_A)
+            self.interpolate_xyz(-40, -10, -60, self.TRI_B)
+            self.interpolate_xyz(-40, 10, -60, self.TRI_B)
+            sleep(0.5)
 
     def sweep(self):
         '''Sweeping function that calculates the distance based a fixed rotation
@@ -300,91 +259,6 @@ class Hex:
     def lidar(self):
         readings = self.sweep()
         print('TOF readings: ', readings)
-
-    def rotate(self, leg, angle):
-        #individual functions for sole angle control ( no IK) WORKS!
-        # hex.rotate(hex.FL,90)
-        self.drivers[leg.rotate.driver].servo[leg.rotate.channel].angle = angle
-
-    def knee(self, leg, angle):
-        #individual functions for sole angle control ( no IK) WORKS!
-        # hex.rotate(hex.FL,90)
-        self.drivers[leg.knee.driver].servo[leg.knee.channel].angle = angle
-    
-    def ankle(self, leg, angle):
-        #individual functions for sole angle control ( no IK) WORKS!
-        # hex.rotate(hex.FL,90)
-        self.drivers[leg.ankle.driver].servo[leg.ankle.channel].angle = angle
-
-    def wallFL(self):
-        self.knee(self.FL, 120)
-        self.ankle(self.FL, 20)
-        self.knee(self.FL, 20)
-        self.ankle(self.FL, 170)
-        self.rotate(self.FL, 170)
-        sleep(1)
-        self.knee(self.FL, 100)
-
-    def wallFR(self):
-        self.knee(self.FR, 100)
-        self.ankle(self.FR, 20)
-        self.knee(self.FR, 20)
-        self.ankle(self.FR, 170)
-        self.rotate(self.FR, 10)
-        sleep(1)
-        self.knee(self.FR, 100)
-
-    def crab(self):
-        self.rotate(self.FL, 120)
-        self.knee(self.FL, 10)
-        self.ankle(self.FL, 10)
-        self.rotate(self.BL, 60)
-        self.knee(self.BL, 10)
-        self.ankle(self.BL,10)
-        self.rotate(self.MR, 90)
-        self.knee(self.MR, 30)
-        self.ankle(self.MR, 40)
-
-    def crab_A_front():
-        self.rotate(self.FL, 120)
-        self.knee(self.FL, 10)
-        self.ankle(self.FL, 10)
-        self.rotate(self.BL, 60)
-        self.knee(self.BL, 10)
-        self.ankle(self.BL,10)
-        self.rotate(self.MR, 90)
-        self.knee(self.MR, 30)
-        self.ankle(self.MR, 40)
-
-    def crab_A_back():
-        return
-
-    def shimmy(self, step = 1):
-        self.home()
-        sleep(0.5)
-        for i in range(step):
-            self.knee(self.FR, 100)
-
-
-
-            self.interpolate_xyz(-20, -10, -30, self.TRI_A) # Lift up
-            self.interpolate_xyz(-20, 30, -10, self.TRI_B)
-            sleep(0.1)
-            self.interpolate_xyz(-20, -10, -10, self.TRI_A) # TriA moving forward
-            self.interpolate_xyz(-20, 30, -10, self.TRI_A)
-            # self.interpolate_xyz(-20, 30, -20, self.Tri_A)
-            sleep(0.1)
-            self.interpolate_xyz(-20, -10, -10, self.TRI_B)
-            self.interpolate_xyz(-20, 30, -30, self.TRI_A)
-            sleep(0.1)
-            self.interpolate_xyz(-20, -10, -30, self.TRI_B)
-            self.interpolate_xyz(-20, 30, -30, self.TRI_B)
-            sleep(0.1)
-
-
-
-
-
 
     # def step_left(self, hi_low = 1):
     #     if hi_low == 0:
@@ -416,3 +290,10 @@ class Hex:
 
 
 
+"""         Climb:
+        hex.interpolate_xyz(-40, 50, -20, hex.LEGS)
+        hex.interpolate_xyz(0, 50, -20, hex.LEGS)
+        hex.interpolate_xyz(-20, 50, -20, hex.LEGS)
+        hex.interpolate_xyz(-20, 100, -20, hex.LEGS)
+        hex.interpolate_xyz(-20, 150, -20, hex.LEGS)
+        hex.interpolate_xyz(-20, 200, -20, hex.LEGS) """
